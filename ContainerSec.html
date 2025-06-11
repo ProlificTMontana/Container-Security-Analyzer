@@ -1,0 +1,595 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Container Security Analyzer</title>
+<style>
+  /* CSS Variables for light and dark theme */
+  :root {
+    --color-bg: #ffffff;
+    --color-text: #374151;
+    --color-text-secondary: #6b7280;
+    --color-primary: #111827;
+    --color-primary-light: #374151;
+    --color-card-bg: #f9fafb;
+    --color-card-shadow: rgba(0,0,0,0.05);
+    --color-btn-bg: #111827;
+    --color-btn-text: #ffffff;
+    --color-btn-hover-bg: #1f2937;
+    --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    --color-success: #16a34a;
+    --color-warning: #ca8a04;
+    --color-danger: #dc2626;
+  }
+  .dark {
+    --color-bg: #1f2937;
+    --color-text: #d1d5db;
+    --color-text-secondary: #9ca3af;
+    --color-primary: #f9fafb;
+    --color-primary-light: #e5e7eb;
+    --color-card-bg: #374151;
+    --color-card-shadow: rgba(0,0,0,0.5);
+    --color-btn-bg: #f9fafb;
+    --color-btn-text: #111827;
+    --color-btn-hover-bg: #e5e7eb;
+    --color-success: #22c55e;
+    --color-warning: #eab308;
+    --color-danger: #ef4444;
+  }
+
+  /* Reset and base */
+  *, *::before, *::after {
+    box-sizing: border-box;
+  }
+  body {
+    margin: 0;
+    padding: 0;
+    background-color: var(--color-bg);
+    color: var(--color-text);
+    font-family: var(--font-sans);
+    line-height: 1.6;
+    font-size: 18px;
+  }
+  a {
+    color: var(--color-primary);
+    text-decoration: none;
+  }
+  a:hover,
+  a:focus {
+    text-decoration: underline;
+    outline: none;
+  }
+
+  /* Container */
+  .container {
+    max-width: 1200px;
+    margin-left: auto;
+    margin-right: auto;
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+
+  /* Sticky Header */
+  header {
+    position: sticky;
+    top: 0;
+    background: var(--color-bg);
+    box-shadow: 0 1px 4px var(--color-card-shadow);
+    z-index: 1000;
+  }
+  nav {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    height: 64px;
+  }
+  .logo {
+    font-weight: 800;
+    font-size: 1.5rem;
+    color: var(--color-primary);
+    user-select: none;
+  }
+  .nav-links {
+    display: flex;
+    gap: 2rem;
+    font-weight: 600;
+    font-size: 1rem;
+    color: var(--color-primary-light);
+  }
+  .nav-links a {
+    transition: color 0.3s ease;
+  }
+  .nav-links a:hover,
+  .nav-links a:focus {
+    color: var(--color-primary);
+    outline: none;
+  }
+
+  /* Theme toggle button */
+  .theme-toggle {
+    background: none;
+    border: 2px solid var(--color-primary-light);
+    border-radius: 9999px;
+    padding: 0.25rem 0.75rem;
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--color-primary-light);
+    cursor: pointer;
+    transition: all 0.3s ease;
+  }
+  .theme-toggle:hover,
+  .theme-toggle:focus {
+    background-color: var(--color-primary-light);
+    color: var(--color-bg);
+    outline: none;
+  }
+
+  /* Hero Section */
+  .hero {
+    padding-top: 6rem;
+    padding-bottom: 4rem;
+    text-align: center;
+  }
+  .hero h1 {
+    font-weight: 700;
+    font-size: 3rem;
+    line-height: 1.1;
+    margin-bottom: 1rem;
+    color: var(--color-primary);
+  }
+  .hero p {
+    color: var(--color-text-secondary);
+    font-size: 1.25rem;
+    max-width: 600px;
+    margin-left: auto;
+    margin-right: auto;
+    margin-bottom: 2rem;
+  }
+  .btn-primary {
+    background-color: var(--color-btn-bg);
+    color: var(--color-btn-text);
+    font-weight: 700;
+    font-size: 1.125rem;
+    padding: 0.75rem 2rem;
+    border: none;
+    border-radius: 0.75rem;
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+    box-shadow: 0 4px 8px rgba(17, 24, 39, 0.2);
+    user-select: none;
+  }
+  .btn-primary:hover,
+  .btn-primary:focus {
+    background-color: var(--color-btn-hover-bg);
+    outline: none;
+    transform: scale(1.05);
+  }
+
+  /* Feature Section */
+  .features {
+    display: grid;
+    gap: 2.5rem;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    padding-top: 4rem;
+    padding-bottom: 6rem;
+  }
+  .card {
+    background-color: var(--color-card-bg);
+    box-shadow: 0 2px 8px var(--color-card-shadow);
+    border-radius: 0.75rem;
+    padding: 2rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    transition: box-shadow 0.3s ease, transform 0.3s ease;
+  }
+  .card:hover,
+  .card:focus-within {
+    box-shadow: 0 8px 20px var(--color-card-shadow);
+    transform: translateY(-4px);
+    outline: none;
+  }
+  .card-icon {
+    font-size: 2.25rem;
+    color: var(--color-primary);
+    user-select: none;
+  }
+  .card-title {
+    font-weight: 700;
+    font-size: 1.25rem;
+    color: var(--color-primary);
+    user-select: none;
+  }
+  .card-desc {
+    color: var(--color-text-secondary);
+    font-size: 1rem;
+    user-select: none;
+    flex-grow: 1;
+  }
+
+  /* Scan Section */
+  .scan-section {
+    background-color: var(--color-card-bg);
+    border-radius: 1rem;
+    box-shadow: 0 4px 12px var(--color-card-shadow);
+    padding: 2rem;
+    max-width: 700px;
+    margin: 0 auto 4rem auto;
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+  }
+
+  .scan-section h2 {
+    font-weight: 700;
+    font-size: 2rem;
+    color: var(--color-primary);
+    margin: 0;
+  }
+
+  .form-group {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+  }
+
+  .form-group input[type="text"] {
+    flex: 1 1 250px;
+    padding: 0.75rem 1rem;
+    font-size: 1rem;
+    border: 2px solid var(--color-primary-light);
+    border-radius: 0.5rem;
+    color: var(--color-primary);
+    background-color: var(--color-bg);
+    transition: border-color 0.2s ease;
+  }
+  .form-group input[type="text"]:focus {
+    border-color: var(--color-btn-bg);
+    outline: none;
+  }
+
+  .scan-button {
+    background-color: var(--color-btn-bg);
+    color: var(--color-btn-text);
+    border: none;
+    border-radius: 0.5rem;
+    padding: 0.75rem 1.5rem;
+    cursor: pointer;
+    font-weight: 700;
+    font-size: 1rem;
+    box-shadow: 0 4px 8px rgba(17, 24, 39, 0.2);
+    user-select: none;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+  }
+  .scan-button:hover,
+  .scan-button:focus {
+    background-color: var(--color-btn-hover-bg);
+    outline: none;
+    transform: scale(1.05);
+  }
+
+  /* Scan Results */
+  .scan-results {
+    display: grid;
+    grid-template-columns: repeat(auto-fit,minmax(100px,1fr));
+    gap: 1rem;
+  }
+
+  .result-card {
+    background: var(--color-bg);
+    border-radius: 0.75rem;
+    padding: 1rem;
+    box-shadow: 0 2px 6px var(--color-card-shadow);
+    text-align: center;
+    transition: box-shadow 0.3s ease, transform 0.3s ease;
+    cursor: default;
+    user-select: none;
+  }
+  .result-card:hover,
+  .result-card:focus {
+    box-shadow: 0 8px 20px var(--color-card-shadow);
+    transform: translateY(-4px);
+    outline: none;
+  }
+  .result-number {
+    font-weight: 700;
+    font-size: 2.25rem;
+    margin-bottom: 0.25rem;
+  }
+  .result-label {
+    font-weight: 600;
+    font-size: 1rem;
+    color: var(--color-text-secondary);
+  }
+  .result-critical {
+    color: var(--color-danger);
+  }
+  .result-high {
+    color: var(--color-warning);
+  }
+  .result-medium {
+    color: #fbbf24; /* amber-400 */
+  }
+  .result-low {
+    color: #60a5fa; /* blue-400 */
+  }
+
+  /* Notification banner */
+  .notification {
+    border-radius: 0.75rem;
+    background-color: var(--color-btn-bg);
+    color: var(--color-btn-text);
+    padding: 1rem 1.5rem;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    user-select: none;
+  }
+  .notification-icon {
+    font-size: 1.5rem;
+  }
+
+  /* Comparison Section */
+  .comparison {
+    background-color: var(--color-card-bg);
+    border-radius: 1rem;
+    padding: 1.5rem 2rem;
+    max-width: 700px;
+    margin: 0 auto;
+    font-size: 1rem;
+    color: var(--color-primary-light);
+    font-weight: 600;
+  }
+  .comparison.highlight {
+    color: var(--color-success);
+  }
+
+  /* Accessibility focus ring fallback */
+  :focus-visible {
+    outline: 3px solid var(--color-primary);
+    outline-offset: 2px;
+  }
+
+  /* Responsive */
+  @media (min-width: 768px) {
+    .hero h1 {
+      font-size: 4rem;
+    }
+    .hero p {
+      font-size: 1.375rem;
+    }
+  }
+</style>
+</head>
+<body>
+<header>
+  <nav class="container" role="navigation" aria-label="Main navigation">
+    <div class="logo" tabindex="0">ContainerSec</div>
+    <div style="display: flex; align-items: center; gap: 2rem;">
+      <div class="nav-links">
+        <a href="#features">Features</a>
+        <a href="https://docs.example.com" target="_blank" rel="noopener noreferrer">Docs</a>
+        <a href="https://github.com/your-repo" target="_blank" rel="noopener noreferrer">GitHub</a>
+      </div>
+      <button id="theme-toggle" class="theme-toggle" aria-pressed="false" aria-label="Toggle dark mode">Dark Mode</button>
+    </div>
+  </nav>
+</header>
+
+<main>
+  <section class="hero" role="banner" aria-labelledby="hero-title">
+    <h1 id="hero-title">Container Security Analyzer</h1>
+    <p>Scan Docker images for vulnerabilities and misconfigurations. Integrate seamlessly with GitHub Actions or any CI pipeline. Get notified in Slack of high and critical issues.</p>
+    <button class="btn-primary" aria-label="Get started with Container Security Analyzer" id="hero-get-started">Get Started</button>
+  </section>
+
+  <section class="scan-section" aria-label="Docker Image Scan">
+    <h2>Scan Docker Image</h2>
+    <div class="form-group">
+      <input type="text" id="image-input" placeholder="Enter Docker image (e.g., nginx:latest)" aria-label="Docker image name" />
+      <button id="scan-btn" class="scan-button" aria-live="polite">Run Scan</button>
+    </div>
+    <div id="scan-result" aria-live="polite" aria-atomic="true" style="min-height: 11rem;">
+      <!-- Scan results will appear here -->
+    </div>
+  </section>
+
+  <section id="features" class="features" aria-label="Features">
+    <article class="card" tabindex="0">
+      <div class="card-icon" aria-hidden="true">🛠️</div>
+      <h2 class="card-title">CI Pipeline Integration</h2>
+      <p class="card-desc">Integrate effortlessly with GitHub Actions or your preferred CI pipelines to automate Docker image scanning.</p>
+    </article>
+    <article class="card" tabindex="0">
+      <div class="card-icon" aria-hidden="true">📣</div>
+      <h2 class="card-title">Slack Notifications</h2>
+      <p class="card-desc">Receive instant Slack notifications for high and critical vulnerabilities to stay alert and act quickly.</p>
+    </article>
+    <article class="card" tabindex="0">
+      <div class="card-icon" aria-hidden="true">📊</div>
+      <h2 class="card-title">Scan Result Comparison</h2>
+      <p class="card-desc">Compare scan results across multiple runs to track improvements and identify regressions over time.</p>
+    </article>
+  </section>
+</main>
+
+<footer>
+  &copy; 2024 Container Security Analyzer. All rights reserved.
+</footer>
+
+<script>
+  // Theme toggle script
+  const themeToggleBtn = document.getElementById('theme-toggle');
+  const prefersDarkScheme = window.matchMedia("(prefers-color-scheme: dark)");
+
+  function setDarkMode(enabled) {
+    if (enabled) {
+      document.documentElement.classList.add('dark');
+      themeToggleBtn.textContent = 'Light Mode';
+      themeToggleBtn.setAttribute('aria-pressed', 'true');
+    } else {
+      document.documentElement.classList.remove('dark');
+      themeToggleBtn.textContent = 'Dark Mode';
+      themeToggleBtn.setAttribute('aria-pressed', 'false');
+    }
+  }
+
+  // Initialize theme based on saved preference or system settings
+  const savedTheme = localStorage.getItem('theme');
+  if (savedTheme === 'dark') {
+    setDarkMode(true);
+  } else if (savedTheme === 'light') {
+    setDarkMode(false);
+  } else {
+    setDarkMode(prefersDarkScheme.matches);
+  }
+
+  themeToggleBtn.addEventListener('click', () => {
+    const isDark = document.documentElement.classList.contains('dark');
+    setDarkMode(!isDark);
+    localStorage.setItem('theme', !isDark ? 'dark' : 'light');
+  });
+
+  // Helper function to create result card element
+  function createResultCard(label, count, severityClass) {
+    return `
+      <div class="result-card ${severityClass || ''}" tabindex="0" role="region" aria-label="${label} vulnerabilities count">
+        <div class="result-number">${count}</div>
+        <div class="result-label">${label}</div>
+      </div>`;
+  }
+
+  // Function to simulate scan results - returns random counts for demo
+  function simulateScanResults() {
+    // Random counts for demonstration, bias towards some zeros
+    return {
+      Critical: Math.floor(Math.random() * 3),
+      High: Math.floor(Math.random() * 6),
+      Medium: Math.floor(Math.random() * 10),
+      Low: Math.floor(Math.random() * 15),
+      Misconfigurations: Math.floor(Math.random() * 8)
+    };
+  }
+
+  // Function to summarize scan results as string
+  function formatResultsHTML(results) {
+    return `
+      <div class="scan-results" role="list">
+        ${createResultCard('Critical', results.Critical, 'result-critical')}
+        ${createResultCard('High', results.High, 'result-high')}
+        ${createResultCard('Medium', results.Medium, 'result-medium')}
+        ${createResultCard('Low', results.Low, '')}
+        ${createResultCard('Misconfigurations', results.Misconfigurations, 'result-warning')}
+      </div>
+    `;
+  }
+
+  // Function to simulate Slack notification sending (just UI simulation)
+  function simulateSlackNotification(results, image) {
+    const highCritical = results.Critical + results.High;
+    if (highCritical > 0) {
+      return `
+      <div class="notification" role="alert" aria-live="assertive">
+        <span class="notification-icon" aria-hidden="true">📣</span>
+        Slack notification sent for <strong>${highCritical}</strong> high/critical vulnerabilities found in <em>${image}</em>.
+      </div>
+      `;
+    }
+    return '';
+  }
+
+  // Function to compare current and previous scan results
+  function compareResults(newRes, prevRes) {
+    if (!prevRes) return 'No previous scan results to compare.';
+    let msgs = [];
+    const levels = ['Critical', 'High', 'Medium', 'Low', 'Misconfigurations'];
+    levels.forEach(level => {
+      if (newRes[level] !== prevRes[level]) {
+        let diff = newRes[level] - prevRes[level];
+        let sign = diff > 0 ? '+' : '';
+        let arrow = diff > 0 ? '▲' : '▼';
+        msgs.push(`${level}: ${prevRes[level]} → ${newRes[level]} (${sign}${diff} ${arrow})`);
+      }
+    });
+    if (msgs.length === 0) {
+      return 'No changes detected compared to the previous scan.';
+    }
+    return msgs.join(' | ');
+  }
+
+  // Manage scan state and update UI
+  const scanBtn = document.getElementById('scan-btn');
+  const imageInput = document.getElementById('image-input');
+  const scanResultDiv = document.getElementById('scan-result');
+  const heroGetStarted = document.getElementById('hero-get-started');
+
+  // Load previous results from localStorage for comparison
+  function loadPreviousScan(image) {
+    try {
+      let scans = JSON.parse(localStorage.getItem('scanHistory') || '{}');
+      return scans[image] || null;
+    } catch {
+      return null;
+    }
+  }
+
+  // Save current scan result
+  function saveScan(image, data) {
+    try {
+      let scans = JSON.parse(localStorage.getItem('scanHistory') || '{}');
+      scans[image] = data;
+      localStorage.setItem('scanHistory', JSON.stringify(scans));
+    } catch (e) {
+      console.error('Failed to save scan results:', e);
+    }
+  }
+
+  // Handle scan
+  scanBtn.addEventListener('click', () => {
+    const image = imageInput.value.trim();
+    if (!image) {
+      scanResultDiv.innerHTML = `<div class="notification" role="alert" aria-live="assertive">
+        <span class="notification-icon">⚠️</span> Please enter a Docker image name to scan.
+      </div>`;
+      return;
+    }
+    scanBtn.disabled = true;
+    scanBtn.textContent = 'Scanning...';
+
+    // Simulate a scan delay
+    scanResultDiv.innerHTML = `<div class="notification" role="status" aria-live="polite">
+      <span class="notification-icon">⏳</span> Scanning <strong>${image}</strong>...
+    </div>`;
+
+    setTimeout(() => {
+      const prevResults = loadPreviousScan(image);
+      const currentResults = simulateScanResults();
+      saveScan(image, currentResults);
+
+      const resultsHTML = formatResultsHTML(currentResults);
+      const notificationHTML = simulateSlackNotification(currentResults, image);
+      const comparisonMessage = compareResults(currentResults, prevResults);
+
+      scanResultDiv.innerHTML = `
+        ${notificationHTML}
+        ${resultsHTML}
+        <div class="comparison" role="status" aria-live="polite">
+          ${comparisonMessage}
+        </div>
+      `;
+    }, 1500); // simulate network delay
+  });
+
+  // Optional: bind "Get Started" button to focus on input
+  heroGetStarted.addEventListener('click', () => {
+    imageInput.focus();
+    imageInput.scrollIntoView({ behavior: 'smooth' });
+  });
+
+</script>
+</body>
+</html>
+
+
